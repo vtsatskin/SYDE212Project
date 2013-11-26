@@ -1,15 +1,20 @@
 require 'open-uri'
 require 'json'
 
-# random article locations:
-#   en: http://en.wikipedia.org/wiki/Special:Random
-#   fr: http://fr.wikipedia.org/wiki/Special:Random
-
 # Represents a Wikipedia article
 class Article
-  def initialize slugName, language
+
+  def self.random language
+    raw = open("http://#{language}.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&format=json").read
+    json = JSON.parse(raw)
+    title = json["query"]["random"].first["title"]
+
+    self.new title, language
+  end
+
+  def initialize title, language
     @language = language
-    @slugName = slugName
+    @slugName = URI::encode(title)
 
     raw = open("http://#{@language}.wikipedia.org/w/api.php?action=query&prop=extracts&titles=#{@slugName}&format=json&explaintext=1").read
     json = JSON.parse(raw)
