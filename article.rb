@@ -9,20 +9,20 @@ class Article
     uri = open("http://#{language}.wikipedia.org/wiki/Special:Random").base_uri
     title = uri.to_s.split("/").last
 
-    self.new title, language
+    self.new :title => title, :lang => language
   end
 
-  def initialize slug, language
-    @language = language
-    @slug = slug
+  def initialize opt = {}
+    @language = opt[:lang] || :en
+    @slug = (opt[:title] && URI.encode(opt[:title])) || opt[:slug]
 
-    raw = open("http://#{@language}.wikipedia.org/w/api.php?action=query&prop=extracts%7Clanglinks&titles=#{@slug}&format=json&explaintext=1&llurl=true").read
+    raw = open("http://#{@language}.wikipedia.org/w/api.php?action=query&prop=extracts%7Clanglinks&titles=#{@slug}&format=json&explaintext=1&llurl=true&lllimit=500").read
     json = JSON.parse(raw)
     @content = json["query"]["pages"].first[1]["extract"]
 
-    langLinks = json["query"]["pages"].first[1]["langLinks"]
+    langLinks = json["query"]["pages"].first[1]["langlinks"]
     langLinks ||= []
-    @languageMap = Hash[langLinks.map { |h| [h["lang"], h["url"].split('/').last] }]
+    @languageMap = Hash[langLinks.map { |h| [h["lang"].to_sym, h["url"].split('/').last] }]
   end
 
   def content
@@ -36,9 +36,7 @@ class Article
 
   def toLang language
     if @languageMap[language]
-      Article.new @languageMap[language], language
-    else
-      nil
+      self.class.new :slug => @languageMap[language], :lang => language
     end
   end
 

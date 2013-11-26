@@ -6,11 +6,15 @@ class ArticleCollector
     num.times.map { Article.random lang }
   end
 
-  def self.randomTranslated num = 1, originalLang = "en", translatedLang = "fr"
+  def self.randomTranslated opt = {}
+    opt[:num] ||= 1
+    opt[:sourceLang] ||= :en
+    opt[:translatedLang] ||= :fr
+
     collection = {}
-    while collection.length < num
-      original = Article.random originalLang
-      translated = original.toLang translatedLang
+    while collection.length < opt[:num]
+      original = Article.random opt[:sourceLang]
+      translated = original.toLang opt[:translatedLang]
       collection[original.slug] = [original, translated] if translated
     end
     collection

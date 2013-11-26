@@ -12,27 +12,36 @@ SYDE212Project
 
 ## Usage
 
+### Fetching an Article
 Fetches a particular article, must supply a full article name (case sensitive) and language:
 
 	Article.new "Bill Gates", "en"
 
-Fetches a random article (a language must be supplied):
+Fetches a random article:
 
-	Article.random "fr"
+	Article.random :lang => :fr
 
+### Working with an Article
 Checking an article's metadata:
 
-	a = Article.random "en"
+	a = Article.random :lang => :en
 	a.content.length # letter count
 	a.wordCount # word count
 
+### Fetching a batch of articles
 Fetching a batch of articles:
 
-	ArticleCollector.random 20, "en"
+	ArticleCollector.random :num => :20, :lang => :en
+
+Fetching a batch of articles:
+
+	ArticleCollector.random :num => :20, :lang => :en
+
+### Exporting
 
 Exporting a batch of articles to a CSV string:
 
-	articles = ArticleCollector.random 20, "en"
+	articles = ArticleCollector.random :num => 50, :lang => :ru
 	MetadataExporter.articlesToCSV articles
 
 Or to a file:
