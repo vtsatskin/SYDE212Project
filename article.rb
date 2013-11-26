@@ -6,9 +6,8 @@ require 'nokogiri'
 class Article
 
   def self.random language
-    raw = open("http://#{language}.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&format=json").read
-    json = JSON.parse(raw)
-    title = json["query"]["random"].first["title"]
+    uri = open("http://#{@language}.wikipedia.org/wiki/Special:Random").base_uri
+    title = uri.to_s.split("/").last
 
     self.new title, language
   end
