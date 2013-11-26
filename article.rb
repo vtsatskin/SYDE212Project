@@ -1,5 +1,6 @@
 require 'open-uri'
 require 'json'
+require 'nokogiri'
 
 # Represents a Wikipedia article
 class Article
@@ -29,9 +30,20 @@ class Article
     @content.split.length
   end
 
+  def toLang language
+    @languageMap ||= _languageLinks
+    @languageMap[language]
+  end
+
   private
 
   def _removeWhitespace string
     string.gsub("\n", ' ').squeeze(' ')
+  end
+
+  def _languageLinks
+    doc = Nokogiri::HTML(open("http://#{@language}.wikipedia.org/wiki/#{@slugName}"))
+    links = doc.css("#p-lang ul a")
+    Hash[links.map { |a| [a.attribute("lang").to_s, "http:" + a.attribute("href").value] }]
   end
 end
