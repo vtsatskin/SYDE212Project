@@ -38,3 +38,11 @@ Exporting a batch of articles to a CSV string:
 Or to a file:
 
 	MetadataExporter.articlesToCSV articles, pathToFile
+
+The format of the CSV is as follows:
+
+	#name,language,letterCount,wordCount
+	Carol_Cass,en,903,143
+	DeCanio,en,50,8
+	Hamworthy,en,2985,492
+	...
