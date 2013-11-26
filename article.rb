@@ -4,9 +4,10 @@ require 'nokogiri'
 
 # Represents a Wikipedia article
 class Article
+  attr_accessor :language, :slug
 
   def self.random language
-    uri = open("http://#{@language}.wikipedia.org/wiki/Special:Random").base_uri
+    uri = open("http://#{language}.wikipedia.org/wiki/Special:Random").base_uri
     title = uri.to_s.split("/").last
 
     self.new title, language
@@ -14,9 +15,9 @@ class Article
 
   def initialize title, language
     @language = language
-    @slugName = URI::encode(title)
+    @slug = URI::encode(title)
 
-    raw = open("http://#{@language}.wikipedia.org/w/api.php?action=query&prop=extracts&titles=#{@slugName}&format=json&explaintext=1").read
+    raw = open("http://#{@language}.wikipedia.org/w/api.php?action=query&prop=extracts&titles=#{@slug}&format=json&explaintext=1").read
     json = JSON.parse(raw)
     @content = json["query"]["pages"].first[1]["extract"]
   end
@@ -31,7 +32,12 @@ class Article
 
   def toLang language
     @languageMap ||= _languageLinks
-    @languageMap[language]
+    title = @languageMap[language].split("/").last
+    Article.new title, language
+  end
+
+  def ==(other)
+    @slug == other.slug && @language == other.language
   end
 
   private
@@ -41,7 +47,7 @@ class Article
   end
 
   def _languageLinks
-    doc = Nokogiri::HTML(open("http://#{@language}.wikipedia.org/wiki/#{@slugName}"))
+    doc = Nokogiri::HTML(open("http://#{@language}.wikipedia.org/wiki/#{@slug}"))
     links = doc.css("#p-lang ul a")
     Hash[links.map { |a| [a.attribute("lang").to_s, "http:" + a.attribute("href").value] }]
   end
