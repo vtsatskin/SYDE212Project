@@ -12,9 +12,9 @@ class Article
     self.new title, language
   end
 
-  def initialize title, language
+  def initialize slug, language
     @language = language
-    @slug = URI::encode(title)
+    @slug = slug
 
     raw = open("http://#{@language}.wikipedia.org/w/api.php?action=query&prop=extracts%7Clanglinks&titles=#{@slug}&format=json&explaintext=1&llurl=true").read
     json = JSON.parse(raw)
