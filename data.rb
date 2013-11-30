@@ -35,4 +35,23 @@ class MetadataExporter
       str
     end
   end
+
+  def self.articlePairsToCSV hash, path = nil
+    str = CSV.generate do |csv|
+      hash.values.each do |pair|
+        original = pair[0]
+        translated = pair[1]
+        wcDiff = original.wordCount - translated.wordCount
+        lengthDiff = original.content.length - translated.content.length
+
+        csv << [original.slug, "#{original.language}-#{translated.language}", lengthDiff, wcDiff]
+      end
+    end
+
+    if path
+      File.open(path, 'w') { |f| f.write(str) }
+    else
+      str
+    end
+  end
 end
