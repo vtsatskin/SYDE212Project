@@ -3,7 +3,8 @@ require 'csv'
 
 class ArticleCollector
   def self.random num = 1, lang = "en"
-    num.times.map { Article.random lang }
+    i = 0
+    num.times.map { puts "Generating #{i} article"; i += 1; Article.random lang; }
   end
 
   def self.randomTranslated opt = {}
@@ -15,7 +16,10 @@ class ArticleCollector
     while collection.length < opt[:num]
       original = Article.random opt[:sourceLang]
       translated = original.toLang opt[:translatedLang]
-      collection[original.slug] = [original, translated] if translated
+      if translated
+        collection[original.slug] = [original, translated]
+        puts "Found #{collection.length} articles"
+      end
     end
     collection
   end
@@ -41,10 +45,8 @@ class MetadataExporter
       hash.values.each do |pair|
         original = pair[0]
         translated = pair[1]
-        wcDiff = original.wordCount - translated.wordCount
-        lengthDiff = original.content.length - translated.content.length
 
-        csv << [original.slug, "#{original.language}-#{translated.language}", lengthDiff, wcDiff]
+        csv << [original.slug, "#{original.language}-#{translated.language}", original.content.length, original.wordCount,  translated.content.length, translated.wordCount]
       end
     end
 
